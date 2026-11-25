@@ -92,6 +92,17 @@ a{color:inherit}
 .pill b{font-weight:400;color:var(--ochre)}
 .pill.off{opacity:0;pointer-events:none;transform:translateY(6px)}
 #stopchip{left:max(16px,2.4vw);top:calc(var(--bar) + 40px)}
+/* podkład muzyczny: cichy, startuje po pierwszym dotknięciu, milknie pod narracją */
+#musicbtn{all:unset;position:fixed;z-index:9;right:max(16px,2.4vw);top:calc(var(--bar) + 40px);display:flex;align-items:center;gap:8px;cursor:pointer;
+  font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--mute);transition:color .3s,opacity .4s}
+#musicbtn:hover{color:var(--ink)}
+#musicbtn .eq{display:flex;align-items:flex-end;gap:2px;height:11px}
+#musicbtn .eq i{width:2px;height:3px;background:currentColor;transition:height .3s}
+#musicbtn.on{color:var(--ochre)}
+#musicbtn.on .eq i{animation:eq 1.1s ease-in-out infinite}
+#musicbtn.on .eq i:nth-child(2){animation-delay:-.4s}#musicbtn.on .eq i:nth-child(3){animation-delay:-.8s}
+@keyframes eq{0%,100%{height:3px}50%{height:11px}}
+@media (prefers-reduced-motion:reduce){#musicbtn.on .eq i{animation:none;height:8px}}
 /* przewodnik TURNIE: stały przycisk + panel z aplikacją */
 #credit{bottom:calc(var(--bar) + 74px)}
 #appbtn{all:unset;position:fixed;z-index:9;right:max(16px,2.4vw);bottom:calc(var(--bar) + 12px);display:flex;align-items:center;gap:12px;padding:8px 18px 8px 8px;border-radius:30px;cursor:pointer;
@@ -193,6 +204,8 @@ body.past .bar, body.past #brand, body.past #chapter, body.past #rail, body.past
 <aside id="apppanel" aria-label="Przewodnik TURNIE" aria-hidden="true"><button id="appclose" type="button" aria-label="Zamknij przewodnik">×</button></aside>
 <button id="listen" class="pill off" type="button" aria-label="Odtwórz odcinek audiobooka"><b>▶</b><span></span><span class="bar2"><i></i></span></button>
 <audio id="player" preload="none"></audio>
+<audio id="bed" src="audio/podklad.mp3" preload="none" loop></audio>
+<button id="musicbtn" type="button" aria-pressed="false" aria-label="Muzyka w tle"><span class="eq"><i></i><i></i><i></i></span><span class="lbl">muzyka</span></button>
 
 <main id="scroller" aria-label="Opowieść o Stanisławie Witkiewiczu"></main>
 
@@ -544,6 +557,32 @@ document.getElementById('appclose').addEventListener('click', closeApp);
 document.getElementById('appscrim').addEventListener('click', closeApp);
 addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.classList.contains('app-open')) closeApp(); });
 player.addEventListener('play', () => appAudio()?.pause());
+// ——— podkład muzyczny: cicho, po pierwszym dotknięciu; milknie, gdy gra narracja (strona lub przewodnik)
+const bed = document.getElementById('bed'), musicBtn = document.getElementById('musicbtn');
+const BED_VOL = 0.14; let bedWanted = true, bedFade = null;
+try { if (localStorage.getItem('turnie-muzyka') === 'off') bedWanted = false; } catch {}
+function fadeBed(to, ms = 1200){
+  clearInterval(bedFade); const from = bed.volume, t0 = performance.now();
+  if (to > 0 && bed.paused) { bed.volume = 0; bed.play().catch(() => {}); }
+  bedFade = setInterval(() => { const k = Math.min(1, (performance.now() - t0) / ms); bed.volume = from + (to - from) * k;
+    if (k >= 1) { clearInterval(bedFade); if (to === 0) bed.pause(); } }, 40);
+}
+function narrationPlaying(){ const a = appAudio(); return (!player.paused && !player.ended) || (a && !a.paused && !a.ended); }
+function syncBed(){
+  const on = bedWanted && !narrationPlaying() && document.visibilityState === 'visible';
+  fadeBed(on ? BED_VOL : 0, on ? 2500 : 700);
+  musicBtn.classList.toggle('on', bedWanted); musicBtn.setAttribute('aria-pressed', String(bedWanted));
+}
+musicBtn.addEventListener('click', e => { e.stopPropagation(); bedWanted = !bedWanted; try { localStorage.setItem('turnie-muzyka', bedWanted ? 'on' : 'off'); } catch {} syncBed(); });
+// przeglądarka pozwala zagrać dopiero po geście użytkownika — pierwszy klik / dotyk / klawisz
+const firstTouch = e => { if (e.target.closest?.('#musicbtn')) return; if (bedWanted && bed.paused) syncBed(); };
+['pointerdown','keydown','touchend'].forEach(ev => addEventListener(ev, firstTouch, {once:true, passive:true}));
+['play','pause','ended'].forEach(ev => player.addEventListener(ev, syncBed));
+document.addEventListener('visibilitychange', syncBed);
+let hookedApp = null;
+setInterval(() => { const a = appAudio(); if (a && a !== hookedApp) { hookedApp = a; ['play','pause','ended'].forEach(ev => a.addEventListener(ev, syncBed)); } }, 1000);
+musicBtn.classList.toggle('on', bedWanted);
+
 appLink.textContent = 'Otwórz przewodnik →'; appLink.removeAttribute('target');
 appLink.addEventListener('click', e => { e.preventDefault(); openApp('mapa'); });
 
