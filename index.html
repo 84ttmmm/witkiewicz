@@ -559,7 +559,7 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.class
 player.addEventListener('play', () => appAudio()?.pause());
 // ——— podkład muzyczny: cicho, po pierwszym dotknięciu; milknie, gdy gra narracja (strona lub przewodnik)
 const bed = document.getElementById('bed'), musicBtn = document.getElementById('musicbtn');
-const BED_VOL = 0.14; let bedWanted = true, bedFade = null;
+const BED_VOL = 0.24; let bedWanted = true, bedFade = null;
 try { if (localStorage.getItem('turnie-muzyka') === 'off') bedWanted = false; } catch {}
 function fadeBed(to, ms = 1200){
   clearInterval(bedFade); const from = bed.volume, t0 = performance.now();
