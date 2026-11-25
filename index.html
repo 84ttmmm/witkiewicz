@@ -103,6 +103,14 @@ a{color:inherit}
 #musicbtn.on .eq i:nth-child(2){animation-delay:-.4s}#musicbtn.on .eq i:nth-child(3){animation-delay:-.8s}
 @keyframes eq{0%,100%{height:3px}50%{height:11px}}
 @media (prefers-reduced-motion:reduce){#musicbtn.on .eq i{animation:none;height:8px}}
+#musicvol{position:fixed;z-index:9;right:max(16px,2.4vw);top:calc(var(--bar) + 64px);width:96px;height:16px;margin:0;background:transparent;-webkit-appearance:none;appearance:none;cursor:pointer;opacity:.75;transition:opacity .3s}
+#musicvol:hover,#musicvol:focus-visible{opacity:1}
+#musicvol::-webkit-slider-runnable-track{height:2px;background:linear-gradient(90deg,var(--ochre) var(--v,50%),rgba(239,228,207,.25) var(--v,50%))}
+#musicvol::-moz-range-track{height:2px;background:rgba(239,228,207,.25)}
+#musicvol::-moz-range-progress{height:2px;background:var(--ochre)}
+#musicvol::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;margin-top:-4.5px;border-radius:50%;background:var(--ink)}
+#musicvol::-moz-range-thumb{width:11px;height:11px;border:0;border-radius:50%;background:var(--ink)}
+#musicvol[hidden]{display:none}
 /* przewodnik TURNIE: stały przycisk + panel z aplikacją */
 #credit{bottom:calc(var(--bar) + 74px)}
 #appbtn{all:unset;position:fixed;z-index:9;right:max(16px,2.4vw);bottom:calc(var(--bar) + 12px);display:flex;align-items:center;gap:12px;padding:8px 18px 8px 8px;border-radius:30px;cursor:pointer;
@@ -206,6 +214,7 @@ body.past .bar, body.past #brand, body.past #chapter, body.past #rail, body.past
 <audio id="player" preload="none"></audio>
 <audio id="bed" src="audio/podklad.mp3" preload="none" loop></audio>
 <button id="musicbtn" type="button" aria-pressed="false" aria-label="Muzyka w tle"><span class="eq"><i></i><i></i><i></i></span><span class="lbl">muzyka</span></button>
+<input id="musicvol" type="range" min="0" max="60" value="24" aria-label="Głośność muzyki w tle">
 
 <main id="scroller" aria-label="Opowieść o Stanisławie Witkiewiczu"></main>
 
@@ -559,7 +568,16 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.class
 player.addEventListener('play', () => appAudio()?.pause());
 // ——— podkład muzyczny: cicho, po pierwszym dotknięciu; milknie, gdy gra narracja (strona lub przewodnik)
 const bed = document.getElementById('bed'), musicBtn = document.getElementById('musicbtn');
-const BED_VOL = 0.24; let bedWanted = true, bedFade = null;
+const musicVol = document.getElementById('musicvol');
+let BED_VOL = 0.24, bedWanted = true, bedFade = null;
+try { const v = parseFloat(localStorage.getItem('turnie-muzyka-glosnosc')); if (v >= 0 && v <= .6) BED_VOL = v; } catch {}
+musicVol.value = Math.round(BED_VOL * 100); musicVol.style.setProperty('--v', (BED_VOL / .6 * 100) + '%');
+musicVol.addEventListener('input', () => {
+  BED_VOL = musicVol.value / 100; musicVol.style.setProperty('--v', (BED_VOL / .6 * 100) + '%');
+  try { localStorage.setItem('turnie-muzyka-glosnosc', String(BED_VOL)); } catch {}
+  if (!bed.paused) { clearInterval(bedFade); bed.volume = BED_VOL; }
+  else if (bedWanted) syncBed();
+});
 try { if (localStorage.getItem('turnie-muzyka') === 'off') bedWanted = false; } catch {}
 function fadeBed(to, ms = 1200){
   clearInterval(bedFade); const from = bed.volume, t0 = performance.now();
@@ -571,7 +589,7 @@ function narrationPlaying(){ const a = appAudio(); return (!player.paused && !pl
 function syncBed(){
   const on = bedWanted && !narrationPlaying() && document.visibilityState === 'visible';
   fadeBed(on ? BED_VOL : 0, on ? 2500 : 700);
-  musicBtn.classList.toggle('on', bedWanted); musicBtn.setAttribute('aria-pressed', String(bedWanted));
+  musicBtn.classList.toggle('on', bedWanted); musicBtn.setAttribute('aria-pressed', String(bedWanted)); musicVol.hidden = !bedWanted;
 }
 musicBtn.addEventListener('click', e => { e.stopPropagation(); bedWanted = !bedWanted; try { localStorage.setItem('turnie-muzyka', bedWanted ? 'on' : 'off'); } catch {} syncBed(); });
 // przeglądarka pozwala zagrać dopiero po geście użytkownika — pierwszy klik / dotyk / klawisz
@@ -581,7 +599,7 @@ const firstTouch = e => { if (e.target.closest?.('#musicbtn')) return; if (bedWa
 document.addEventListener('visibilitychange', syncBed);
 let hookedApp = null;
 setInterval(() => { const a = appAudio(); if (a && a !== hookedApp) { hookedApp = a; ['play','pause','ended'].forEach(ev => a.addEventListener(ev, syncBed)); } }, 1000);
-musicBtn.classList.toggle('on', bedWanted);
+musicBtn.classList.toggle('on', bedWanted); musicVol.hidden = !bedWanted;
 
 appLink.textContent = 'Otwórz przewodnik →'; appLink.removeAttribute('target');
 appLink.addEventListener('click', e => { e.preventDefault(); openApp('mapa'); });
