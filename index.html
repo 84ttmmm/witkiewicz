@@ -96,6 +96,7 @@ a{color:inherit}
 #musicbtn{all:unset;position:fixed;z-index:9;right:max(16px,2.4vw);top:calc(var(--bar) + 40px);display:flex;align-items:center;gap:8px;cursor:pointer;
   font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--mute);transition:color .3s,opacity .4s}
 #musicbtn:hover{color:var(--ink)}
+#musicbtn,#brand{text-shadow:0 1px 10px rgba(0,0,0,.85),0 0 2px rgba(0,0,0,.6)}
 #musicbtn .eq{display:flex;align-items:flex-end;gap:2px;height:11px}
 #musicbtn .eq i{width:2px;height:3px;background:currentColor;transition:height .3s}
 #musicbtn.on{color:var(--ochre)}
@@ -133,10 +134,14 @@ body.app-open #apppanel{transform:none;visibility:visible;transition:transform .
   background:rgba(239,228,207,.12);color:var(--ink);font-size:18px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 #appscrim{position:fixed;inset:0;z-index:29;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .4s}
 @media (max-width:720px){
-  #appbtn{right:12px;padding:7px}
-  #appbtn .ic{width:42px;height:42px}
-  #appbtn .ic+span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-  #listen{max-width:calc(100vw - 100px)}
+  #appbtn{right:12px;padding:6px 14px 6px 6px;gap:9px}
+  #appbtn .ic{width:36px;height:36px}
+  #appbtn .ic img{width:20px;height:20px}
+  #appbtn b{font-size:14px;white-space:nowrap}
+  #appbtn small{display:none}
+  #listen{max-width:calc(100vw - 222px)}
+  #listen span:not(.bar2){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  #listen .bar2{display:none}
   #apppanel{top:max(10px,env(safe-area-inset-top));left:0;right:0;bottom:0;width:auto;border-radius:22px 22px 0 0;transform:translateY(105%)}
   body.app-open #appscrim{opacity:1;pointer-events:auto}
 }
@@ -183,9 +188,9 @@ body.past .bar, body.past #brand, body.past #chapter, body.past #rail, body.past
 
 @media (max-width:700px){
   :root{--bar:4vh}
-  .beat{bottom:7vh}
+  .beat{bottom:calc(var(--bar) + 84px)}            /* nad paskiem odcinka i przyciskiem przewodnika */
   #rail{display:none}
-  #credit{max-width:70vw;font-size:9px}
+  #credit{left:12px;right:12px;bottom:3px;max-width:none;text-align:center;font-size:8.5px;line-height:1.25;color:rgba(239,228,207,.5)}  /* podpis w czarnym pasie kadru, nie na tekście */
   #chapter{display:none}
   .beat.title,.beat.chap{padding:0 16px}
   .title .pre,.chap .num{letter-spacing:.2em}
@@ -207,7 +212,7 @@ body.past .bar, body.past #brand, body.past #chapter, body.past #rail, body.past
 <div id="credit"></div>
 <div id="hint">przewiń</div>
 <a id="stopchip" class="pill off" href="#szlak"><b>◉</b><span></span></a>
-<button id="appbtn" type="button" aria-controls="apppanel" aria-expanded="false"><span class="ic"><img src="app/assets/orn/rozeta-gwiazda.png" alt=""></span><span><b>Przewodnik</b><small>mapa · audio · spacer</small></span></button>
+<button id="appbtn" type="button" aria-controls="apppanel" aria-expanded="false"><span class="ic"><img src="app/assets/orn/rozeta-gwiazda.png" alt=""></span><span><b>Sprawdź aplikację</b><small>mapa · audio · spacer</small></span></button>
 <div id="appscrim"></div>
 <aside id="apppanel" aria-label="Przewodnik TURNIE" aria-hidden="true"><button id="appclose" type="button" aria-label="Zamknij przewodnik">×</button></aside>
 <button id="listen" class="pill off" type="button" aria-label="Odtwórz odcinek audiobooka"><b>▶</b><span></span><span class="bar2"><i></i></span></button>
