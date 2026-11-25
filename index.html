@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Człowiek, który wymyślił Zakopane</title>
+<meta name="description" content="Stanisław Witkiewicz 1851–1915. Opowieść w obrazach z epoki: od beczułki prochu na Żmudzi do wagonu z trumną, który przejechał wojenną Europę do Zakopanego.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#0b0a08; --ink:#efe4cf; --mute:#b9ab90; --ochre:#c9a46a; --line:rgba(239,228,207,.38);
+  --bar:6.5vh;
+  --serif:'Old Standard TT','Times New Roman',serif;
+  --mono:'Old Standard TT','Times New Roman',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--black)}
+body{background:var(--black);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+
+/* ---------- STAGE ---------- */
+#stage{position:fixed;inset:0;overflow:hidden;background:var(--black)}
+.layer{position:absolute;inset:0;opacity:0;visibility:hidden;will-change:opacity}
+.layer.on{visibility:visible}
+.layer img{position:absolute;left:0;top:0;max-width:none;user-select:none;will-change:transform,filter;backface-visibility:hidden}
+.layer img.feather{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14%,#000 86%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 14%,#000 86%,transparent 100%)}
+.layer .shade{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 45%,transparent 35%,rgba(0,0,0,.55) 100%),
+             linear-gradient(to top,rgba(0,0,0,.78) 0%,rgba(0,0,0,0) 46%)}
+.layer.card{background:var(--black)}
+/* the slim window the next frame grows out of */
+#dim{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}
+#frame{position:absolute;left:50%;top:50%;border:1px solid var(--ink);opacity:0;pointer-events:none;transform:translate(-50%,-50%)}
+
+/* grain + letterbox */
+#grain{position:fixed;inset:-50%;pointer-events:none;opacity:.10;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 1.2s steps(6) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}60%{transform:translate(-2%,-1%)}80%{transform:translate(3%,3%)}100%{transform:translate(0,0)}}
+.bar{position:fixed;left:0;right:0;height:var(--bar);background:#000;z-index:5;pointer-events:none}
+.bar.t{top:0}.bar.b{bottom:0}
+#sweep{position:fixed;left:0;top:50%;height:1px;width:100%;background:var(--ink);transform-origin:center;transform:scaleX(0);opacity:0;z-index:4;pointer-events:none}
+
+/* ---------- TEXT ---------- */
+#text{position:fixed;inset:var(--bar) 0;z-index:3;pointer-events:none}
+.beat{position:absolute;left:max(16px,7vw);right:max(16px,7vw);bottom:9vh;max-width:46rem;opacity:0;will-change:opacity,transform,filter}
+.beat .k{font-family:var(--mono);font-size:clamp(11px,1.05vw,13px);letter-spacing:.22em;text-transform:uppercase;color:var(--ochre);display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.beat .k::before{content:'';width:42px;height:1px;background:var(--ochre)}
+.beat p{font-size:clamp(23px,3vw,40px);line-height:1.18;font-weight:400;text-wrap:balance;text-shadow:0 2px 24px rgba(0,0,0,.6)}
+.beat p em{font-style:italic;color:#fff}
+.beat.q p{font-style:italic;font-weight:300;font-size:clamp(24px,3.3vw,46px)}
+.beat.q p::before{content:'„'}.beat.q p::after{content:'”'}
+.beat .who{margin-top:14px;font-family:var(--mono);font-size:clamp(10px,.95vw,12px);letter-spacing:.14em;color:var(--mute);text-transform:uppercase}
+/* chapter cards */
+.beat.chap{left:max(16px,5vw);right:max(40px,6vw);bottom:auto;top:50%;max-width:none;text-align:center;transform:translateY(-50%)}
+.chap .num{font-family:var(--mono);font-size:clamp(11px,1.1vw,13px);letter-spacing:.5em;color:var(--ochre)}
+.chap h2{font-weight:300;font-size:clamp(54px,11vw,170px);line-height:.92;letter-spacing:-.01em;margin:.18em 0 .12em}
+.chap .yrs{font-family:var(--mono);font-size:clamp(12px,1.2vw,15px);letter-spacing:.4em;color:var(--mute)}
+.chap .rule{display:block;width:min(340px,50vw);height:1px;margin:28px auto 0;background:var(--line);transform-origin:center}
+.beat.title{left:0;right:0;bottom:auto;top:50%;max-width:none;text-align:center;transform:translateY(-50%)}
+.title .pre{font-family:var(--mono);font-size:clamp(11px,1.1vw,13px);letter-spacing:.45em;color:var(--ochre);text-transform:uppercase}
+.title h1{font-weight:300;font-size:clamp(44px,8.2vw,128px);line-height:.95;margin:.25em auto .3em;max-width:12ch}
+.title h1 em{font-style:italic}
+.title .sub{font-family:var(--mono);font-size:clamp(11px,1.1vw,13px);letter-spacing:.3em;color:var(--mute)}
+
+/* ---------- CHROME ---------- */
+#brand{position:fixed;top:calc(var(--bar) + 14px);left:max(16px,2.4vw);z-index:6;font-family:var(--mono);font-size:11px;letter-spacing:.32em;color:var(--mute);text-transform:uppercase;pointer-events:none}
+#brand b{color:var(--ink);font-weight:400}
+#credit{position:fixed;right:max(16px,2.4vw);bottom:calc(var(--bar) + 12px);z-index:6;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:rgba(239,228,207,.6);max-width:min(48ch,60vw);text-align:right;transition:opacity .4s}
+#rail{position:fixed;right:max(14px,2vw);top:50%;transform:translateY(-50%);height:46vh;width:1px;background:rgba(239,228,207,.18);z-index:6}
+#rail i{position:absolute;left:0;top:0;width:1px;background:var(--ink);height:0}
+#rail span{position:absolute;left:-3px;width:7px;height:1px;background:var(--mute)}
+#rail span.cur{background:var(--ochre);left:-6px;width:13px}
+#hint{position:fixed;left:50%;bottom:calc(var(--bar) + 18px);transform:translateX(-50%);z-index:6;font-family:var(--mono);font-size:10px;letter-spacing:.4em;color:var(--mute);text-transform:uppercase;transition:opacity .6s;display:flex;flex-direction:column;align-items:center;gap:10px}
+#hint::after{content:'';width:1px;height:38px;background:linear-gradient(var(--ink),transparent);animation:drip 2.2s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+#chapter{position:fixed;top:calc(var(--bar) + 14px);right:max(16px,2.4vw);z-index:6;font-family:var(--mono);font-size:11px;letter-spacing:.28em;color:var(--mute);text-transform:uppercase;text-align:right}
+
+#scroller{position:relative;z-index:1}
+
+/* spis budowli */
+.roll{list-style:none;margin:26px auto 0;max-width:780px;columns:2 300px;column-gap:44px;text-align:left}
+.roll li{font-size:clamp(16px,1.5vw,21px);line-height:1.25;padding:6px 0;border-top:1px solid rgba(239,228,207,.14);break-inside:avoid;opacity:0;display:flex;gap:12px;align-items:baseline}
+.roll li span{font-family:var(--mono);font-size:11px;color:var(--ochre);letter-spacing:.1em}
+.roll li i{margin-left:auto;font-style:normal;font-family:var(--mono);font-size:11px;color:var(--mute)}
+
+/* znacznik przystanku + odtwarzacz rozdziału */
+.pill{position:fixed;z-index:8;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:rgba(11,10,8,.62);border:1px solid rgba(239,228,207,.22);padding:9px 14px;text-decoration:none;backdrop-filter:blur(6px);transition:opacity .4s,transform .4s;cursor:pointer}
+.pill:hover{border-color:var(--ochre)}
+.pill b{font-weight:400;color:var(--ochre)}
+.pill.off{opacity:0;pointer-events:none;transform:translateY(6px)}
+#stopchip{left:max(16px,2.4vw);top:calc(var(--bar) + 40px)}
+/* przewodnik TURNIE: stały przycisk + panel z aplikacją */
+#credit{bottom:calc(var(--bar) + 74px)}
+#appbtn{all:unset;position:fixed;z-index:9;right:max(16px,2.4vw);bottom:calc(var(--bar) + 12px);display:flex;align-items:center;gap:12px;padding:8px 18px 8px 8px;border-radius:30px;cursor:pointer;
+  background:rgba(20,18,15,.66);backdrop-filter:saturate(1.5) blur(16px);-webkit-backdrop-filter:saturate(1.5) blur(16px);border:.5px solid rgba(239,228,207,.22);box-shadow:0 10px 30px rgba(0,0,0,.4);
+  transition:transform .35s cubic-bezier(.32,.72,0,1),opacity .3s}
+#appbtn:hover{transform:translateY(-2px)}
+#appbtn:active{transform:scale(.96)}
+#appbtn .ic{width:38px;height:38px;border-radius:50%;background:var(--ochre);display:grid;place-items:center}
+#appbtn .ic img{width:22px;height:22px;filter:brightness(0);transform:rotate(-10deg);transition:transform .8s cubic-bezier(.32,.72,0,1)}
+#appbtn:hover .ic img{transform:rotate(80deg)}
+#appbtn b{display:block;font-weight:400;font-size:17px;color:var(--ink);line-height:1.1}
+#appbtn small{display:block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+body.app-open #appbtn{opacity:0;pointer-events:none;transform:scale(.9)}
+#apppanel{position:fixed;z-index:30;top:12px;right:12px;bottom:12px;width:min(430px,calc(100vw - 24px));border-radius:28px;overflow:hidden;background:#0b0a08;
+  border:.5px solid rgba(239,228,207,.18);box-shadow:0 30px 90px rgba(0,0,0,.65);transform:translateX(calc(100% + 30px));visibility:hidden;
+  transition:transform .6s cubic-bezier(.32,.72,0,1),visibility 0s .6s}
+body.app-open #apppanel{transform:none;visibility:visible;transition:transform .6s cubic-bezier(.32,.72,0,1)}
+#apppanel iframe{width:100%;height:100%;border:0;display:block}
+#appclose{all:unset;position:absolute;z-index:2;top:12px;right:12px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  background:rgba(239,228,207,.12);color:var(--ink);font-size:18px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+#appscrim{position:fixed;inset:0;z-index:29;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .4s}
+@media (max-width:720px){
+  #appbtn{right:12px;padding:7px}
+  #appbtn .ic{width:42px;height:42px}
+  #appbtn .ic+span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  #listen{max-width:calc(100vw - 100px)}
+  #apppanel{top:max(10px,env(safe-area-inset-top));left:0;right:0;bottom:0;width:auto;border-radius:22px 22px 0 0;transform:translateY(105%)}
+  body.app-open #appscrim{opacity:1;pointer-events:auto}
+}
+#listen{left:max(16px,2.4vw);bottom:calc(var(--bar) + 12px);font-family:var(--mono)}
+#listen .bar2{width:70px;height:1px;background:rgba(239,228,207,.25);position:relative}
+#listen .bar2 i{position:absolute;left:0;top:0;height:1px;background:var(--ochre);width:0}
+
+/* szlak */
+#szlak{position:relative;z-index:7;background:var(--black);padding:14vh max(16px,7vw) 8vh;border-top:1px solid rgba(239,228,207,.12)}
+#szlak .k{font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:var(--ochre);text-transform:uppercase}
+#szlak h3{font-weight:300;font-size:clamp(38px,5.5vw,76px);line-height:1;margin:14px 0 18px}
+#szlak p.lead{font-size:clamp(19px,1.8vw,24px);color:var(--mute);max-width:46rem;line-height:1.4;margin-bottom:28px}
+.sz-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:28px;align-items:start}
+#map{height:min(68vh,620px);border:1px solid rgba(239,228,207,.18);background:#1a1712;filter:sepia(.35) saturate(.8) brightness(.92)}
+.sz-tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.btn{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:transparent;border:1px solid rgba(239,228,207,.35);padding:12px 16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px}
+.btn:hover{border-color:var(--ochre);color:#fff}
+.btn.pri{background:var(--ochre);color:#16120b;border-color:var(--ochre)}
+#geo-msg{font-family:var(--mono);font-size:12px;color:var(--mute);min-height:1.4em;margin-bottom:14px;line-height:1.5}
+#stops{list-style:none;border-top:1px solid rgba(239,228,207,.12)}
+#stops li{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 4px;border-bottom:1px solid rgba(239,228,207,.12);cursor:pointer}
+#stops li:hover,#stops li.sel{background:rgba(201,164,106,.08)}
+#stops li .n{font-family:var(--mono);font-size:11px;color:var(--ochre)}
+#stops li .t{font-size:19px;line-height:1.2}
+#stops li .d{font-family:var(--mono);font-size:11px;color:var(--mute);white-space:nowrap}
+#stops li button{all:unset;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--ink);border:1px solid rgba(239,228,207,.3);padding:5px 8px;margin-left:8px}
+#stops li button:hover{border-color:var(--ochre)}
+.mk{width:28px;height:28px;border-radius:50%;background:#0b0a08;border:1px solid var(--ochre);color:var(--ochre);font:11px/26px var(--mono);text-align:center}
+.mk.sel{background:var(--ochre);color:#0b0a08}
+.me{width:14px;height:14px;border-radius:50%;background:#f3e2bd;border:3px solid #0b0a08;box-shadow:0 0 0 2px #f3e2bd}
+.leaflet-container{font-family:var(--mono)}
+body.past .bar, body.past #brand, body.past #chapter, body.past #rail, body.past #credit, body.past #stopchip, body.past #grain{opacity:0;pointer-events:none}
+.bar,#brand,#chapter,#rail,#credit,#grain{transition:opacity .5s}
+@media (max-width:860px){.sz-grid{grid-template-columns:1fr}#map{height:56vh}}
+
+/* ---------- END / SOURCES (normal flow) ---------- */
+#end{position:relative;z-index:7;background:var(--black);padding:16vh max(16px,7vw) 12vh;border-top:1px solid rgba(239,228,207,.12)}
+#end h3{font-weight:300;font-size:clamp(34px,5vw,64px);line-height:1;margin-bottom:28px}
+#end p.lead{font-size:clamp(19px,1.8vw,24px);color:var(--mute);max-width:46rem;line-height:1.4;margin-bottom:56px}
+#end ol{list-style:none;columns:2 340px;column-gap:48px;font-family:var(--mono);font-size:12px;line-height:1.55;color:var(--mute)}
+#end li{break-inside:avoid;padding:10px 0;border-top:1px solid rgba(239,228,207,.1)}
+#end li b{color:var(--ink);font-weight:400}
+#end .foot{margin-top:64px;font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:rgba(239,228,207,.45);text-transform:uppercase}
+
+@media (max-width:700px){
+  :root{--bar:4vh}
+  .beat{bottom:7vh}
+  #rail{display:none}
+  #credit{max-width:70vw;font-size:9px}
+  #chapter{display:none}
+  .beat.title,.beat.chap{padding:0 16px}
+  .title .pre,.chap .num{letter-spacing:.2em}
+  .chap .yrs,.title .sub{letter-spacing:.18em}
+}
+@media (prefers-reduced-motion:reduce){#grain{animation:none}#hint::after{animation:none}}
+</style>
+</head>
+<body>
+
+<div id="stage"><div id="dim"></div><div id="frame"></div></div>
+<div id="grain"></div>
+<div id="sweep"></div>
+<div class="bar t"></div><div class="bar b"></div>
+<div id="text"></div>
+<div id="brand"><b>Turnie</b> · szlak Witkiewicza</div>
+<div id="chapter"></div>
+<div id="rail"><i></i></div>
+<div id="credit"></div>
+<div id="hint">przewiń</div>
+<a id="stopchip" class="pill off" href="#szlak"><b>◉</b><span></span></a>
+<button id="appbtn" type="button" aria-controls="apppanel" aria-expanded="false"><span class="ic"><img src="app/assets/orn/rozeta-gwiazda.png" alt=""></span><span><b>Przewodnik</b><small>mapa · audio · spacer</small></span></button>
+<div id="appscrim"></div>
+<aside id="apppanel" aria-label="Przewodnik TURNIE" aria-hidden="true"><button id="appclose" type="button" aria-label="Zamknij przewodnik">×</button></aside>
+<button id="listen" class="pill off" type="button" aria-label="Odtwórz odcinek audiobooka"><b>▶</b><span></span><span class="bar2"><i></i></span></button>
+<audio id="player" preload="none"></audio>
+
+<main id="scroller" aria-label="Opowieść o Stanisławie Witkiewiczu"></main>
+
+<section id="szlak">
+  <div class="k">Szlak Witkiewicza · Zakopane</div>
+  <h3>Teraz przejdź się tam</h3>
+  <p class="lead">Jedenaście miejsc z tej opowieści stoi do dziś. Włącz lokalizację, a pokażemy, które jest najbliżej, i puścimy nagranie o nim. Pełny przewodnik, z prowadzeniem po trasie i odtwarzaniem na miejscu, jest w aplikacji TURNIE.</p>
+  <div class="sz-grid">
+    <div id="map" role="region" aria-label="Mapa szlaku"></div>
+    <div>
+      <div class="sz-tools">
+        <button class="btn pri" id="locate" type="button">◎ Pokaż, gdzie jestem</button>
+        <a class="btn" id="app-link" href="#" target="_blank" rel="noopener">Otwórz aplikację ↗</a>
+      </div>
+      <div id="geo-msg" aria-live="polite"></div>
+      <ol id="stops"></ol>
+    </div>
+  </div>
+</section>
+
+<section id="end">
+  <h3>Źródła obrazów</h3>
+  <p class="lead">Wszystkie kadry to dokumenty z epoki: obrazy, ryciny, pocztówki i fotografie w domenie publicznej. Nic nie zostało wygenerowane. Tekst opiera się na skryptach audiobooka TURNIE „Człowiek, który wymyślił Zakopane” i na ich źródłach: Paryscy 1973, nekrolog Korniłowicza (Pamiętnik TT t. 36), Rocznik Podhalański XI, Radzikowski 1901.</p>
+  <ol id="sources"></ol>
+  <p class="foot">TURNIE · Posłuchaj historii miejsc, które mijasz</p>
+</section>
+
+<script>
+/* ============================================================
+   STORY — każda scena: obraz (img), punkt wejścia kamery (f: [x,y] 0–1),
+   długość w ekranach (len) i bity tekstu z oknami czasu (w: [od,do] 0–1).
+   ============================================================ */
+const STORY = [
+  {img:'kozuch', f:[.47,.30], fit:'height', len:1.8, credit:'Stanisław Witkiewicz, fotografia, l. 90. XIX w., zbiory Muzeum Tatrzańskiego · domena publiczna', beats:[
+    {t:'title', w:[0,.52], html:'<div class="pre">Stanisław Witkiewicz · 1851–1915</div><h1>Człowiek,<br>który <em>wymyślił</em><br>Zakopane</h1><div class="sub">opowieść w obrazach z epoki</div>'},
+    {w:[.58,.80], p:'Litwin. Gruźlik. Malarz, który przyjechał pod Tatry umierać.'},
+  ]},
+  {img:'prolog-1915', f:[.50,.27], len:1.7, credit:'„Stanisław Witkiewicz według ostatniej fotografii”, rycina prasowa, ok. 1915 · domena publiczna', beats:[
+    {k:'Wrzesień 1915', w:[.06,.40], p:'Przez Europę, która strzela do siebie na wszystkich frontach, jedzie wagon kolejowy z&nbsp;trumną.'},
+    {q:1, w:[.44,.80], p:'Śpij Żołnierzu, w cichym grobie — niech się Polska przyśni Tobie', who:'napis na wieku trumny'},
+  ]},
+  {card:1, ch:'I', len:1.1, beats:[{t:'chap', w:[.05,.85], html:'<div class="num">I</div><h2>Proch</h2><div class="yrs">1851 — 1875</div><span class="rule"></span>'}]},
+  {img:'urdomina', f:[.36,.36], len:1.7, credit:'Stanisław Witkiewicz, „Dwór w Urdominie”, l. 70. XIX w. · domena publiczna', beats:[
+    {k:'Żmudź, 1851', w:[.06,.40], p:'W dworze pod Szawlami rodzi się dziewiąte dziecko Witkiewiczów. Dom mówi po polsku, służba śpiewa po litewsku, a&nbsp;nikomu to nie przeszkadza.'},
+    {w:[.44,.78], p:'Za oknami stoją <em>smutkelisy</em>: rzeźbione krzyże przydrożne. Carscy urzędnicy każą je wycinać, a lud stawia je od nowa.'},
+  ]},
+  {img:'ulani', f:[.30,.42], len:1.7, credit:'Stanisław Witkiewicz, „Ułani” · domena publiczna', beats:[
+    {k:'1863 · powstanie styczniowe', w:[.06,.40], p:'Jedenastoletni Staś powozi kucykiem do leśnego obozu. Na wózku, pod sianem: żywność i&nbsp;beczułka prochu.'},
+    {w:[.44,.78], p:'Potem konfiskata majątku i zesłanie całej rodziny do Tomska. Cztery lata Syberii.'},
+  ]},
+  {img:'orka', f:[.74,.46], len:1.6, credit:'Stanisław Witkiewicz, „Orka”, 1875 · domena publiczna', beats:[
+    {k:'Petersburg → Monachium', w:[.06,.40], p:'Chce malować, wbrew biedzie. W Monachium dzieli pracownię i&nbsp;głód z&nbsp;Chełmońskim.'},
+    {w:[.44,.78], p:'Wyniesie stamtąd przekonanie na całe życie: sztuka i pieniądze to dwa osobne królestwa.'},
+  ]},
+  {card:1, ch:'II', len:1.1, beats:[{t:'chap', w:[.05,.85], html:'<div class="num">II</div><h2>Suchoty i sława</h2><div class="yrs">1875 — 1886</div><span class="rule"></span>'}]},
+  {img:'przedwiosnie', f:[.50,.56], len:1.7, credit:'Stanisław Witkiewicz, „Przedwiośnie”, Muzeum Narodowe w Warszawie · domena publiczna', beats:[
+    {k:'Warszawa · „Wędrowiec”', w:[.06,.40], p:'Salon chce husarii i królów. Witkiewicz maluje śnieg, konie i światło, i pisze: obraz ocenia się po malarstwie, nie po temacie.'},
+    {w:[.44,.78], p:'Lawina zarzutów: kosmopolita. Z tych bitew wyrośnie „Sztuka i krytyka u nas” i nowoczesna polska krytyka.'},
+  ]},
+  {img:'modrzejewska', f:[.56,.34], len:1.5, credit:'Jan Mieczkowski, Helena Modrzejewska, fotografia atelierowa · domena publiczna', beats:[
+    {k:'Krąg', w:[.08,.74], p:'Do pracowni na poddaszu ciągną najciekawsi ludzie epoki. Także Helena Modrzejewska, gwiazda dwóch kontynentów. Wróci w tej historii w roli, jakiej nikt by jej nie dał.'},
+  ]},
+  {img:'wiatr-halny', f:[.50,.30], len:1.7, credit:'Stanisław Witkiewicz, „Wiatr halny”, 1895, Muzeum Narodowe w Krakowie · domena publiczna', beats:[
+    {k:'Połowa lat 80.', w:[.06,.40], p:'Krwotoki, gorączki, tygodnie w łóżku. Diagnoza: gruźlica. Lekarze rozmawiają szeptem w przedpokoju.'},
+    {w:[.44,.78], p:'Kuracja: górskie powietrze. Bogatych wysyła się do Davos. On dostaje adres bliższy — wieś u stóp Tatr.'},
+  ]},
+  {card:1, ch:'III', len:1.1, beats:[{t:'chap', w:[.05,.85], html:'<div class="num">III</div><h2>Wielga watra</h2><div class="yrs">1886 — 1891</div><span class="rule"></span>'}]},
+  {img:'wjazd-1890', f:[.50,.46], len:1.7, credit:'Walery Eljasz-Radzikowski, wjazd do Zakopanego, ok. 1890 — reprodukcja z ekspozycji, fot. Wikimedia Commons, CC BY-SA', beats:[
+    {k:'Luty 1886', w:[.06,.40], p:'Zakopane to jeszcze wieś: jedna ulica, która wiosną zamienia się w rzekę błota. Sanie z Chabówki przywożą umierającego malarza.'},
+    {w:[.44,.78], p:'I on nie umiera. W marcu wchodzi zimą na Kopę Magury, w śniegu po pas.'},
+  ]},
+  {img:'lyznik', f:[.38,.44], len:1.9, credit:'Łyżnik — ilustracja z „Na przełęczy”, Warszawa 1891 · Polona, domena publiczna', beats:[
+    {k:'Czarna izba przy Kościeliskiej', w:[.06,.36], p:'Maria Dembowska prowadzi go do kurnej chałupy. Na ścianie wisi łyżnik: rzeźbiona listwa na łyżki.'},
+    {q:1, w:[.42,.80], p:'Szczęśliwa ręka, która wyniosła z mroku chałupy na blask słońca pierwszy łyżnik, zanieciła iskierkę, z której ospaliła sie wielga watra', who:'Stanisław Witkiewicz'},
+  ]},
+  {img:'watra', f:[.55,.30], len:1.5, credit:'Watra — ilustracja z „Na przełęczy”, 1891 · Polona, domena publiczna', beats:[
+    {w:[.08,.74], p:'Zobaczył to, czego nie widziały setki wykształconych oczu: chałupa nie jest folklorem. To <em>kompletna architektura</em>, z gramatyką i słownikiem.'},
+  ]},
+  {img:'sabala', f:[.50,.34], len:1.7, credit:'„Sabała”, drzeworyt wg rysunku S. Witkiewicza, „Kłosy” · domena publiczna', beats:[
+    {k:'Jan Krzeptowski Sabała', w:[.06,.40], p:'Kłusownik, gawędziarz, gęślarz. Witkiewicz słucha go godzinami i notuje gwarę, rytm i obrazy.'},
+    {q:1, w:[.44,.80], p:'W znacznej mierze właśnie dzięki niemu stali się postaciami „legendowymi”', who:'Paryscy, Encyklopedia tatrzańska, 1973'},
+  ]},
+  {img:'chalubinski', f:[.50,.30], len:1.3, credit:'Tytus Chałubiński, fotografia portretowa · Polona / Wikimedia Commons, domena publiczna', beats:[
+    {k:'Doktor · ksiądz · kłusownik', w:[.08,.74], p:'Chałubiński, ks. Stolarczyk i Sabała. Legenda Zakopanego nie powstała sama. <em>Ktoś ją napisał.</em>'},
+  ]},
+  {img:'na-przeleczy', f:[.50,.18], len:1.6, credit:'Karta tytułowa „Na przełęczy. Wrażenia i obrazy z Tatr”, Warszawa 1891 · Polona, domena publiczna', beats:[
+    {k:'1891', w:[.06,.40], p:'„Na przełęczy”: wyprawy z Sabałą, burza, wesele, pogrzeb. Gwara po raz pierwszy zapisana z miłością, a nie z politowaniem.'},
+    {w:[.44,.78], p:'Pokolenie Polaków pozna Tatry najpierw z tych stron, a dopiero potem z okna wagonu.'},
+  ]},
+  {img:'z-synem', f:[.50,.36], fit:'height', len:1.6, credit:'Stanisław Witkiewicz z synem, fotografia, ok. 1893, zbiory Muzeum Tatrzańskiego · domena publiczna', beats:[
+    {k:'Zima 1891 · chrzest', w:[.06,.40], p:'Małego Stasia, przyszłego Witkacego, do chrztu podają Helena Modrzejewska i Sabała. Wielka dama i&nbsp;niepiśmienny góral nad jedną chrzcielnicą, jako równi.'},
+    {w:[.44,.78], p:'Sabała traktuje to serio: przesiaduje u Witkiewiczów, przygrywa chłopcu na gęślikach i&nbsp;opowiada mu bajki.'},
+  ]},
+  {card:1, ch:'IV', len:1.1, beats:[{t:'chap', w:[.05,.85], html:'<div class="num">IV</div><h2>Zakład o dom</h2><div class="yrs">1892 — 1897</div><span class="rule"></span>'}]},
+  {img:'chalupa', stop:3, f:[.50,.40], len:1.8, credit:'Chałupa — ilustracja z „Na przełęczy”, 1891 · Polona, domena publiczna', beats:[
+    {k:'Kościeliska · 1892–1893', w:[.06,.40], p:'Górale przystają przy płocie. Dzieje się rzecz niewidziana: <em>pański dom stawiany po góralsku.</em> Nazywa się Koliba.'},
+    {q:1, w:[.44,.80], p:'Nawskróś swojski; nie ma w nim ani jednego szczegółu wymyślonego lub zapożyczonego', who:'Mieczysław Karłowicz o Kolibie'},
+  ]},
+  {img:'oksza', stop:6, f:[.50,.42], len:1.7, credit:'Willa Oksza, Zakopane, fot. Andrzej Otrębski · Wikimedia Commons, CC BY-SA 4.0', beats:[
+    {k:'Oksza · 1894–1895', w:[.06,.38], p:'Inwestor, urzędnik z Sosnowca, pisze do mistrza ostrożnie: piece u Barucha, kominy na pierwszego kwietnia, dom koniecznie na pierwszego czerwca, bo sezon.'},
+    {q:1, w:[.44,.80], p:'Czy Wojtek z Obrochtą dadzą radę temu?', who:'z listu Kossakowskiego do Witkiewicza, 1894'},
+  ]},
+  {img:'z-rojem', f:[.24,.22], len:1.9, credit:'Leon Wyczółkowski, Portret Stanisława Witkiewicza z Wojciechem Rojem, Muzeum Narodowe w Krakowie · domena publiczna', beats:[
+    {k:'Spółka', w:[.06,.38], p:'Szkic na kratkowanym papierze, pięć milimetrów na metr. Resztę robią cieśle. Za żaden projekt nie bierze ani grosza.'},
+    {q:1, w:[.44,.80], p:'Artystycznym twórcą tego stylu był Stanisław Witkiewicz, a Roj — praktycznym wykonawcą', who:'Paryscy, 1973'},
+  ]},
+  {img:'pod-jedlami', stop:7, f:[.38,.40], len:1.9, credit:'„Dom pod Jedlami na Kozińcu (styl zakopiański)”, pocztówka, nakł. S. Ciszewskiego, 1900–1914 · Polona, domena publiczna', beats:[
+    {k:'Koziniec · 1896–1897', w:[.06,.38], p:'Zrąb z potężnych płazów na zamki i drewniane kołki. W ścianach Domu pod Jedlami nie ma ani jednego gwoździa.'},
+    {q:1, w:[.44,.80], p:'P. Witkiewicz się trzęsie z radości, jaki dom będzie ładny', who:'cieśla Wojciech Roj w liście do inwestora'},
+  ]},
+  {img:'zofiowka', f:[.50,.40], len:1.5, credit:'„Zofiówka” : willa w stylu zakopiańskim przy ulicy Chałubińskiego, pocztówka, 1900 · Polona, domena publiczna', beats:[
+    {k:'Zofiówka · 1896', w:[.08,.74], p:'Dom Dolińskich przy Chałubińskiego. Tego domu już nie ma. Zostały pocztówki takie jak ta.'},
+  ]},
+  {img:'hawranek', stop:5, f:[.55,.42], len:1.5, credit:'„Zakład Dra. Hawranka — Zakopane”, pocztówka, 1901 · Polona, domena publiczna', beats:[
+    {k:'Sanatorium dra Hawranka · 1897', w:[.08,.74], p:'Styl wchodzi tam, gdzie leczy się gruźlików, takich jak on sam. Dziś ten dom zna się jako willę Rialto.'},
+  ]},
+  {img:'wladyslawka', stop:4, f:[.45,.42], len:1.5, credit:'„Zakopane : Władysławka”, pocztówka, 1903 · Polona, domena publiczna', beats:[
+    {k:'Władysławka · Kasprusie · 1902', w:[.08,.74], p:'Dom Lewandowskich. Wpisany na listę jego budowli w nekrologu z 1916 roku; dziś zwany Czerwonym Dworem.'},
+  ]},
+  {card:1, len:2.2, beats:[{t:'chap', w:[.03,.97], html:'<div class="num">Spis Korniłowicza · 1916</div><h2 style="font-size:clamp(40px,6.5vw,96px)">Siedemnaście budowli</h2><ol class="roll">'+
+    [['Koliba','1892–1893'],['Pepita (dom dra Chrostowskiego)','1893'],['Oksza','1894–1895'],['Zofiówka','1896'],['Sanatorium dra Hawranka','1897'],['Pod Jedlami','1897'],['Domek kustosza przy muzeum',''],['Klasztorek Braci Albertów, Kalatówki','1898'],['Konstantynówka','1900'],['Grażyna','1900–1901'],['Władysławka','1902'],['Na Antołówce','1904'],['Pod Wykrotem','1905–1906'],['Dom Dłuskich, Kościeliska','1907'],['Kapliczka Korniłowiczów, Bystre','1907'],['Kaplica w Jaszczurówce','1908'],['Gmach Muzeum im. Chałubińskiego','1913']]
+    .map((x,i)=>`<li data-at="${(.10+i*.042).toFixed(3)}"><span>${String(i+1).padStart(2,'0')}</span>${x[0]}<i>${x[1]}</i></li>`).join('')+'</ol><div class="yrs" style="margin-top:18px">bez honorarium za żaden z nich</div>'}]},
+  {card:1, ch:'V', len:1.1, beats:[{t:'chap', w:[.05,.85], html:'<div class="num">V</div><h2>Wojna o wszystko</h2><div class="yrs">1898 — 1907</div><span class="rule"></span>'}]},
+  {img:'kosciol', stop:1, f:[.46,.40], len:1.5, credit:'„Nowy-Kościół : Zakopane”, pocztówka, 1899 · Polona, domena publiczna', beats:[
+    {k:'Front: kościół', w:[.08,.74], p:'W nowym kościele Świętej Rodziny miał urządzić całe wnętrze po zakopiańsku: parzenice na ławkach, leluje w&nbsp;ołtarzach.'},
+  ]},
+  {img:'oltarz', stop:1, f:[.50,.68], len:1.8, credit:'„Zakopane : szczyt ołtarza M.B. Różańcowej pomysłu St. Witkiewicza”, pocztówka, [1923] · Polona, domena publiczna', beats:[
+    {k:'Ołtarz różańcowy', w:[.06,.38], p:'Górale cieszą się głośno: ich wzory z chałup pierwszy raz na ołtarzu. Potem następuje „urzędowe wyrzucenie stylu z kościoła”.'},
+    {q:1, w:[.44,.80], p:'Podła sztuka i podły czyn, wyzłacany jak samowar', who:'Witkiewicz w liście do siostry'},
+  ]},
+  {img:'morskie-oko', f:[.55,.55], len:1.7, credit:'Stanisław Witkiewicz, „Morskie Oko”, ryt. P. Boczkowski, rozkładówka z „Na przełęczy”, 1891 · Polona, domena publiczna', beats:[
+    {k:'1902 · Graz', w:[.06,.38], p:'Ten sam rok: cykl „Bagno” przeciw wójtowi Chramcowi, proces we Lwowie i&nbsp;wyrok trybunału w sporze granicznym.'},
+    {q:1, w:[.44,.80], p:'Mój złoty! Morskie Oko nasze! Sprawiedliwość zwyciężyła', who:'list do syna'},
+  ]},
+  {img:'brat-albert', stop:10, f:[.46,.30], len:1.5, credit:'Adam Chmielowski — Brat Albert, fotografia, „Nowości Illustrowane” · domena publiczna', beats:[
+    {k:'Krupówki · sanie', w:[.08,.74], p:'Witkiewicz, Chełmoński i powożący Brat Albert. „Razem trzech takich dziadów zebranych dość trudno by w Polsce spotkać.” Dla Alberta projektuje pustelnię na Kalatówkach, bez ornamentu.'},
+  ]},
+  {img:'jaszczurowka', stop:9, f:[.50,.46], len:1.5, credit:'„Jaszczurówka: kościół”, pocztówka, 1902–1926 · Polona, domena publiczna', beats:[
+    {k:'Jaszczurówka · 1904–1907', w:[.08,.74], p:'Kaplica Najświętszego Serca Jezusowego. Projekt zaginął. Do dziś nie wiadomo, które detale są zgodne z jego zamysłem.'},
+  ]},
+  {card:1, ch:'VI', len:1.1, beats:[{t:'chap', w:[.05,.85], html:'<div class="num">VI</div><h2>Lovran znaczy powrót</h2><div class="yrs">1908 — 1915</div><span class="rule"></span>'}]},
+  {img:'malczewski-1902', f:[.46,.28], len:1.7, credit:'Jacek Malczewski, Portret Stanisława Witkiewicza, 1902 · domena publiczna', beats:[
+    {k:'Jesień 1908 · Chabówka', w:[.06,.38], p:'Pociąg na południe, do Lovranu nad Adriatykiem. Do Zakopanego już nigdy nie wróci żywy.'},
+    {w:[.44,.78], p:'Jedzie z nim Maria Dembowska — ta, która 22 lata wcześniej kupiła w czarnej izbie pierwszy łyżnik.'},
+  ]},
+  {img:'witkacy-ojciec', f:[.40,.32], len:1.6, credit:'Stanisław Ignacy Witkiewicz (Witkacy), Portret ojca · domena publiczna', beats:[
+    {k:'Listy', w:[.06,.40], p:'Z pokoju z widokiem na cudze morze płyną setki listów. Do syna — przyszłego Witkacego. Do Piłsudskiego. Do gazdy Ślimaka, gwarą.'},
+    {q:1, w:[.44,.80], p:'Czapka jak czapka, ale tkwi w niej treść doniosła', who:'o maciejówce od Piłsudskiego'},
+  ]},
+  {img:'muzeum', stop:0, f:[.74,.38], len:1.6, credit:'„Zakopane : Towarzystwo Tatrzańskie i muzeum”, pocztówka · Polona, domena publiczna', beats:[
+    {q:1, w:[.06,.40], p:'Nie mogę się zgodzić na budowanie w Zakopanem bezstylowego budynku dla Muzeum Tatrzańskiego', who:'z Lovranu, 1913'},
+    {w:[.44,.78], p:'Attyk w stylu zakopiańskim nie ma? „Mogę tylko odpowiedzieć, że odtąd będą.”'},
+  ]},
+  {img:'cmentarz', stop:2, f:[.46,.42], len:2.0, credit:'„Stary cmentarz w Zakopanem”, pocztówka · Polona, domena publiczna', beats:[
+    {k:'5 września 1915 · 17 września 1915', w:[.06,.36], p:'Umiera w Lovranie. Maria Dembowska zdobywa wagon i wiezie trumnę przez wojenną Europę. Osiem dni.'},
+    {w:[.40,.62], p:'Miasto staje na ulicach. Kraju nie ma na mapie, a naród idzie za trumną człowieka, który uczył go, że polskość można zbudować.'},
+    {w:[.66,.84], p:'Nad grobem na Pęksowym Brzyzku staje smutkelis, żmudzki krzyż z dzieciństwa.'},
+  ]},
+  {img:'malczewski-1897', f:[.40,.30], len:2.0, last:1, credit:'Jacek Malczewski, Portret Stanisława Witkiewicza, 1897 · domena publiczna', beats:[
+    {w:[.08,.46], p:'Przyjechał tu umierać. Został osiemnaście lat i&nbsp;<em>przeprojektował całe miasto.</em>'},
+    {t:'title', w:[.54,1.01], html:'<div class="pre">Szlak Witkiewicza</div><h1>Ojczyzna to ziemia i&nbsp;groby</h1><div class="sub">napis nad bramą starego cmentarza</div>'},
+  ]},
+];
+
+/* ============================================================ ENGINE */
+const IMG_V = 3;             // podbij po podmianie zdjęć w img/
+const DIVE = .22;           // końcowa część sceny przeznaczona na przejście
+const VH = () => window.innerHeight;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const stage = document.getElementById('stage'), frame = document.getElementById('frame');
+const textBox = document.getElementById('text'), credit = document.getElementById('credit');
+const sweep = document.getElementById('sweep'), hint = document.getElementById('hint');
+const scroller = document.getElementById('scroller'), chapterEl = document.getElementById('chapter');
+const rail = document.getElementById('rail'), railFill = rail.querySelector('i');
+
+const ease = x => x<.5 ? 4*x*x*x : 1-Math.pow(-2*x+2,3)/2;
+const clamp = (x,a=0,b=1) => Math.min(b,Math.max(a,x));
+const smooth = (a,b,x) => { const t=clamp((x-a)/(b-a)); return t*t*(3-2*t); };
+
+// build layers + beats
+let chapterName = '';
+STORY.forEach((s,i) => {
+  const L = document.createElement('div'); L.className = 'layer' + (s.card?' card':'');
+  if (s.img) {
+    const im = new Image(); im.alt=''; im.decoding='async'; im.src = 'img/'+s.img+'.jpg?v='+IMG_V;
+    im.fetchPriority = i < 4 ? 'high' : 'low';
+    im.onload = () => { s.nat=[im.naturalWidth, im.naturalHeight]; layout(s); render(); };
+    L.appendChild(im); s.im = im;
+    const sh=document.createElement('div'); sh.className='shade'; L.appendChild(sh);
+  }
+  stage.insertBefore(L, document.getElementById('dim')); s.L = L;
+  if (s.card && s.ch) chapterName = s.ch; s.chap = chapterName;
+  s.B = s.beats.map(b => {
+    const d = document.createElement('div');
+    d.className = 'beat' + (b.q?' q':'') + (b.t?' '+b.t:'');
+    d.innerHTML = b.html || ((b.k?`<div class="k">${b.k}</div>`:'') + `<p>${b.p}</p>` + (b.who?`<div class="who">— ${b.who}</div>`:''));
+    textBox.appendChild(d); return {el:d, w:b.w, t:b.t};
+  });
+});
+// scroll length + rail ticks
+let total = 0;
+STORY.forEach(s => { s.start = total; total += s.len; s.end = total; });
+scroller.style.height = (total*100 + 100) + 'vh';
+STORY.forEach(s => { if (s.card) { const t=document.createElement('span'); t.style.top=(s.start/total*100)+'%'; rail.appendChild(t); s.tick=t; } });
+
+// sources list
+const src = document.getElementById('sources');
+STORY.filter(s=>s.img).forEach(s => { const li=document.createElement('li'); const [a,...r]=s.credit.split(' · '); li.innerHTML=`<b>${a}</b><br>${r.join(' · ')}`; src.appendChild(li); });
+
+// cover-fit with focal clamp
+function layout(s){
+  if (!s.nat) return;
+  const vw=innerWidth, vh=innerHeight, [iw,ih]=s.nat;
+  // fit:'height' — małe/kwadratowe zdjęcie na ciemnym tle: wysokość ekranu, boki wtopione w czerń
+  const wide = vw > vh * 1.05;
+  const c = (s.fit === 'height' && wide) ? vh/ih * 1.04 : Math.max(vw/iw, vh/ih) * 1.02;
+  s.im.classList.toggle('feather', s.fit === 'height' && wide);
+  const dw=iw*c, dh=ih*c;
+  const ox = dw <= vw ? (vw-dw)/2 : clamp(vw/2 - s.f[0]*dw, vw-dw, 0);
+  const oy = clamp(vh/2 - s.f[1]*dh, vh-dh, 0);
+  Object.assign(s, {dw,dh,ox,oy, fx:s.f[0]*dw, fy:s.f[1]*dh});
+  s.im.style.width = dw+'px'; s.im.style.height = dh+'px';
+  s.im.style.transformOrigin = `${s.fx}px ${s.fy}px`;
+}
+function place(s, k, move, blur){
+  // k = skala wokół punktu wejścia; move 0..1 = jak bardzo punkt jedzie do środka ekranu
+  if (!s.im || !s.nat) return;
+  const cx = innerWidth/2 - (s.ox+s.fx), cy = innerHeight/2 - (s.oy+s.fy);
+  s.im.style.transform = `translate3d(${s.ox + cx*move}px,${s.oy + cy*move}px,0) scale(${k})`;
+  s.im.style.filter = blur>0.05 ? `blur(${blur.toFixed(2)}px)` : 'none';
+}
+
+let lastIdx = -1;
+function render(){
+  const pos = scrollY / VH();               // w ekranach
+  hint.style.opacity = pos > .15 ? 0 : 1;
+  document.body.classList.toggle('past', pos > total - .05);
+  railFill.style.height = clamp(pos/total)*100 + '%';
+  let idx = STORY.findIndex(s => pos < s.end); if (idx<0) idx = STORY.length-1;
+  const s = STORY[idx], n = STORY[idx+1];
+  const t = clamp((pos - s.start)/s.len);
+  const divePart = (!n || s.last) ? 0 : DIVE;
+  const tl = divePart ? clamp(t/(1-divePart)) : t;               // czas „życia” sceny
+  const u  = divePart ? clamp((t-(1-divePart))/divePart) : 0;     // czas przejścia
+  const e = ease(u);
+
+  STORY.forEach((x,i) => { if (i!==idx && i!==idx+1) { x.L.classList.remove('on'); x.L.style.opacity=0; } });
+
+  // current
+  s.L.classList.add('on');
+  if (reduce) {
+    place(s, 1.04, 0, 0); s.L.style.opacity = 1 - e;
+  } else {
+    const kb = 1 + .10*tl;                                // powolny najazd (Ken Burns)
+    const k = kb * (1 + 5.5*e*e);                          // nurkowanie w szczegół
+    place(s, k, e, 10*smooth(.35,1,u));
+    s.L.style.opacity = 1 - smooth(.55,.95,u);
+  }
+  // next — wyrasta z cienkiego okna w środku kadru
+  if (n && divePart) {
+    n.L.classList.add('on');
+    if (reduce) { place(n,1.04,0,0); n.L.style.opacity = e; }
+    else {
+      const g = smooth(.30,1,u);
+      n.L.style.opacity = smooth(.30,.62,u);
+      const vw=innerWidth, vh=innerHeight, sc = .16 + .84*ease(g);
+      n.L.style.clipPath = g<1 ? `inset(${(1-sc)*vh/2}px ${(1-sc)*vw/2}px)` : 'none';
+      place(n, 1.5 - .5*ease(g), 0, 6*(1-g));
+      frame.style.width = sc*vw+'px'; frame.style.height = sc*vh+'px';
+      frame.style.opacity = u>.3 && g<.98 ? .7*(1-g) : 0;
+    }
+  } else { frame.style.opacity = 0; }
+  s.L.style.clipPath = 'none';
+  // hairline sweep on the cut
+  sweep.style.opacity = reduce ? 0 : (smooth(.05,.3,u) * (1-smooth(.5,.75,u)) * .8);
+  sweep.style.transform = `scaleX(${smooth(.05,.45,u)})`;
+
+  // beats
+  STORY.forEach((x,i) => x.B.forEach(b => { if (i!==idx) b.el.style.opacity = 0; }));
+  let dimV = 0;
+  s.B.forEach(b => {
+    const [a,z] = b.w, span = z-a, fin = Math.min(.08, span*.25);
+    const fadeIn = a <= 0 ? 1 : smooth(a, a+fin, tl);
+    const vis = fadeIn * (1 - smooth(z-fin, z, tl)) * (1 - smooth(0,.25,u));
+    const rise = (1 - fadeIn) * 18;
+    b.el.style.opacity = vis;
+    if (b.t === 'title') dimV = Math.max(dimV, vis);
+    const base = (b.t ? 'translateY(-50%) ' : '');
+    b.el.style.transform = base + `translateY(${rise}px)`;
+    b.el.style.filter = vis < .98 ? `blur(${(1-vis)*6}px)` : 'none';
+    const rule = b.el.querySelector('.rule'); if (rule) rule.style.transform = `scaleX(${smooth(a+fin*.5, a+fin*2.5, tl)})`;
+    b.el.querySelectorAll('[data-at]').forEach(li => { const at = +li.dataset.at; li.style.opacity = smooth(at, at+.05, tl); });
+  });
+
+  document.getElementById('dim').style.opacity = (dimV * .62).toFixed(3);
+
+  // chrome
+  if (idx !== lastIdx) {
+    credit.style.opacity = 0;
+    setTimeout(() => { credit.textContent = s.credit || ''; credit.style.opacity = s.credit ? 1 : 0; }, 180);
+    chapterEl.textContent = s.chap ? 'Rozdział ' + s.chap : 'Prolog';
+    updateChip(s); updateListen(s);
+    STORY.forEach(x => x.tick && x.tick.classList.toggle('cur', x.ch === s.chap));
+    lastIdx = idx;
+  }
+}
+
+/* ============================================================ SZLAK, AUDIO, LOKALIZACJA
+   Współrzędne przystanków: z aplikacji TURNIE (turnie-portfolio/app.js) — dane Tomka, nie zmieniać ręcznie. */
+const APP_URL = 'app/';   // przewodnik TURNIE wbudowany w stronę (panel obok)
+const STOPS = [
+  ['Muzeum Tatrzańskie',[49.29512634852666,19.95022447944102]],
+  ['Kościół Najświętszej Rodziny',[49.29658852805738,19.949422088738512]],
+  ['Pęksowy Brzyzek',[49.29631509435688,19.946730511413477]],
+  ['Willa Koliba',[49.294132890205795,19.943447831575806]],
+  ['Czerwony Dwór',[49.2911667825786,19.94828664147593]],
+  ['Willa Rialto',[49.291841924803364,19.96561614356479]],
+  ['Willa Oksza',[49.288382005628115,19.966079877395305]],
+  ['Dom Pod Jedlami',[49.286835250685236,19.977879949430367]],
+  ['Witkiewiczówka',[49.2917655117043,19.976639320253668]],
+  ['Kaplica w Jaszczurówce',[49.28427131013727,20.001266149839115]],
+  ['Pustelnia na Kalatówkach',[49.26454727502745,19.974743602647155]],
+];
+const EPISODES = {I:['Proch','odcinek-1'],II:['Suchoty i sława','odcinek-2'],III:['Wielga watra','odcinek-3'],IV:['Zakład o dom','odcinek-4'],V:['Wojna o wszystko','odcinek-5'],VI:['Lovran znaczy powrót','odcinek-6']};
+const dist = (a,b) => { const r=Math.PI/180, p=(b[0]-a[0])*r, l=(b[1]-a[1])*r; const h=Math.sin(p/2)**2+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(l/2)**2; return 6371000*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h)); };
+const metres = n => n<1000 ? Math.round(n/10)*10+' m' : (n/1000).toFixed(1).replace('.',',')+' km';
+let me = null, map = null, meMarker = null, markers = [], selStop = -1;
+const chip = document.getElementById('stopchip'), listen = document.getElementById('listen'), player = document.getElementById('player');
+const appLink = document.getElementById('app-link');
+// Przewodnik (aplikacja TURNIE w app/) — panel obok strony, ładowany przy pierwszym otwarciu
+const appPanel = document.getElementById('apppanel'), appBtn = document.getElementById('appbtn');
+let appFrame = null;
+function appAudio(){ try { return appFrame?.contentDocument?.getElementById('audio'); } catch { return null; } }
+function openApp(hash){
+  if (!appFrame) {
+    appFrame = document.createElement('iframe');
+    appFrame.title = 'Przewodnik TURNIE'; appFrame.allow = 'geolocation; autoplay; screen-wake-lock';
+    appFrame.src = 'app/#' + (hash || 'mapa'); appPanel.appendChild(appFrame);
+  } else if (hash) appFrame.contentWindow.location.hash = hash;
+  if (!player.paused) player.pause();                     // jedno nagranie naraz
+  document.body.classList.add('app-open'); appPanel.setAttribute('aria-hidden','false'); appBtn.setAttribute('aria-expanded','true');
+  setTimeout(() => document.getElementById('appclose').focus(), 300);
+}
+function closeApp(){
+  document.body.classList.remove('app-open'); appPanel.setAttribute('aria-hidden','true'); appBtn.setAttribute('aria-expanded','false'); appBtn.focus();
+}
+appBtn.addEventListener('click', () => openApp());
+document.getElementById('appclose').addEventListener('click', closeApp);
+document.getElementById('appscrim').addEventListener('click', closeApp);
+addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.classList.contains('app-open')) closeApp(); });
+player.addEventListener('play', () => appAudio()?.pause());
+appLink.textContent = 'Otwórz przewodnik →'; appLink.removeAttribute('target');
+appLink.addEventListener('click', e => { e.preventDefault(); openApp('mapa'); });
+
+function updateChip(s){
+  if (s.stop == null) { chip.classList.add('off'); return; }
+  const [name, c] = STOPS[s.stop];
+  chip.querySelector('span').textContent = `Przystanek ${String(s.stop+1).padStart(2,'0')} · ${name}` + (me ? ' · ' + metres(dist(me,c)) : '');
+  chip.dataset.stop = s.stop; chip.classList.remove('off');
+}
+chip.addEventListener('click', () => { const i = +chip.dataset.stop; setTimeout(() => selectStop(i, true), 400); });
+
+// odtwarzacz: odcinek rozdziału albo nagranie przystanku
+let playing = null;  // {kind:'ep'|'stop', key, label}
+function updateListen(s){
+  if (playing && !player.paused) return;               // nie przełączaj w trakcie słuchania
+  const ep = EPISODES[s.chap];
+  if (!ep) { listen.classList.add('off'); return; }
+  listen.dataset.src = 'audio/'+ep[1]+'.mp3';
+  listen.dataset.label = `Odcinek ${s.chap} · ${ep[0]}`;
+  listen.querySelector('span').textContent = listen.dataset.label;
+  listen.classList.remove('off');
+}
+function play(src, label){
+  if (player.getAttribute('src') !== src) { player.src = src; }
+  player.play().catch(() => {}); playing = {src, label};
+  listen.dataset.src = src; listen.querySelector('span').textContent = label; listen.classList.remove('off');
+}
+listen.addEventListener('click', () => {
+  if (!player.paused && player.getAttribute('src') === listen.dataset.src) { player.pause(); return; }
+  play(listen.dataset.src, listen.querySelector('span').textContent);
+});
+player.addEventListener('play',  () => listen.querySelector('b').textContent = '❚❚');
+player.addEventListener('pause', () => listen.querySelector('b').textContent = '▶');
+player.addEventListener('timeupdate', () => { listen.querySelector('.bar2 i').style.width = (player.duration ? player.currentTime/player.duration*100 : 0) + '%'; });
+
+// lista przystanków
+const stopsEl = document.getElementById('stops');
+STOPS.forEach(([name], i) => {
+  const li = document.createElement('li');
+  li.innerHTML = `<span class="n">${String(i+1).padStart(2,'0')}</span><span class="t">${name}</span><span class="d"><span class="dd"></span><button type="button" aria-label="Posłuchaj: ${name}">▶ słuchaj</button></span>`;
+  li.addEventListener('click', e => { if (e.target.tagName === 'BUTTON') { e.stopPropagation(); selectStop(i, false); play(`audio/przystanek-${String(i+1).padStart(2,'0')}.mp3`, `Przystanek ${String(i+1).padStart(2,'0')} · ${name}`); return; } selectStop(i, true); });
+  stopsEl.appendChild(li);
+});
+function refreshDistances(){
+  stopsEl.querySelectorAll('li').forEach((li,i) => li.querySelector('.dd').textContent = me ? metres(dist(me, STOPS[i][1])) : '');
+}
+function selectStop(i, pan){
+  selStop = i;
+  stopsEl.querySelectorAll('li').forEach((li,k) => li.classList.toggle('sel', k===i));
+  markers.forEach((m,k) => m.getElement() && m.getElement().firstChild.classList.toggle('sel', k===i));
+  if (map && pan) map.setView(STOPS[i][1], 16, {animate:!reduce});
+}
+
+// mapa (Leaflet ładowany dopiero, gdy sekcja się zbliża)
+function initMap(){
+  if (map || !window.L) return;
+  map = L.map('map', {zoomControl:true, scrollWheelZoom:false}).setView([49.287,19.968], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
+  markers = STOPS.map(([name,c],i) => L.marker(c, {title:name, icon:L.divIcon({className:'', html:`<div class="mk">${i+1}</div>`, iconSize:[28,28], iconAnchor:[14,14]})})
+    .addTo(map).on('click', () => selectStop(i, false)));
+  map.fitBounds(STOPS.map(s => s[1]), {padding:[30,30]});
+  if (me) showMe();
+}
+function loadLeaflet(){
+  if (window.L) return initMap();
+  const css = document.createElement('link'); css.rel='stylesheet'; css.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css'; document.head.appendChild(css);
+  const js = document.createElement('script'); js.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js'; js.onload = initMap;
+  js.onerror = () => { document.getElementById('map').innerHTML = '<p style="padding:20px;font-family:var(--mono);font-size:12px;color:var(--mute)">Mapa wymaga internetu. Lista przystanków działa bez niej.</p>'; };
+  document.head.appendChild(js);
+}
+new IntersectionObserver((es, o) => { if (es.some(e => e.isIntersecting)) { loadLeaflet(); o.disconnect(); } }, {rootMargin:'800px'}).observe(document.getElementById('szlak'));
+
+function showMe(){
+  if (!map || !me) return;
+  if (!meMarker) meMarker = L.marker(me, {icon:L.divIcon({className:'', html:'<div class="me"></div>', iconSize:[14,14], iconAnchor:[7,7]}), title:'Tu jesteś'}).addTo(map);
+  else meMarker.setLatLng(me);
+}
+const geoMsg = document.getElementById('geo-msg');
+document.getElementById('locate').addEventListener('click', () => {
+  if (!('geolocation' in navigator)) { geoMsg.textContent = 'Ta przeglądarka nie udostępnia lokalizacji.'; return; }
+  geoMsg.textContent = 'Szukam Cię…';
+  navigator.geolocation.watchPosition(p => {
+    me = [p.coords.latitude, p.coords.longitude];
+    const near = STOPS.map((s,i) => ({i, d:dist(me, s[1])})).sort((a,b) => a.d-b.d)[0];
+    const name = STOPS[near.i][0];
+    geoMsg.innerHTML = near.d < 80
+      ? `Jesteś przy przystanku <b style="color:var(--ink);font-weight:400">${name}</b>. Kliknij ▶ słuchaj.`
+      : `Najbliżej masz: <b style="color:var(--ink);font-weight:400">${name}</b>, ${metres(near.d)} w linii prostej. Dokładność ±${Math.round(p.coords.accuracy)} m.`;
+    refreshDistances(); showMe(); selectStop(near.i, false);
+    if (map && !geoMsg.dataset.fitted) { map.fitBounds([me, STOPS[near.i][1]], {padding:[60,60], maxZoom:16}); geoMsg.dataset.fitted = 1; }
+    lastIdx = -1; render();
+  }, err => {
+    geoMsg.textContent = err.code === 1 ? 'Brak zgody na lokalizację. Możesz ją włączyć w ustawieniach przeglądarki.' : 'Nie udało się ustalić położenia. Spróbuj na zewnątrz albo za chwilę.';
+  }, {enableHighAccuracy:true, maximumAge:10000, timeout:20000});
+});
+
+let ticking = false;
+addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { render(); ticking = false; }); } }, {passive:true});
+addEventListener('resize', () => { STORY.forEach(layout); render(); });
+render();
+</script>
+</body>
+</html>
